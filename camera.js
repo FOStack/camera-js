@@ -11,7 +11,7 @@ function adjust() {
     video.style.left = '0vw';
 }
 
-function flip(v='environment') {
+function flip(v='environment') { 
     const constraints = {
         video: {
             facingMode: v
