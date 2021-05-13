@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "felixo-dev"
+  },
+  "targets": {
+    "felixo-dev": {
+      "hosting": {
+        "cam": [
+          "js-camera"
+        ]
+      }
+    }
+  }
+}

@@ -3,18 +3,27 @@ let video = document.createElement('video');
 const devices = navigator.mediaDevices || null;
 
 function adjust() {
-    video.videoWidth = '100vw';
-    video.videoHeight = '100vh';
+    video.videoWidth = '100%';
+    video.videoHeight = '100%';
     video.style.margin = '0 auto';
     video.style.position = 'absolute';
-    video.style.top = '50vh';
-    video.style.left = '50vw';
-    video.style.transform = 'translate(-50%, -50%)';
+    video.style.top = '0vh';
+    video.style.left = '0vw';
+}
+
+function flip(v='environment') {
+    const constraints = {
+        video: {
+            facingMode: v
+        }
+    };
+    video.style.transform = (v=='user')?'scale(-1, 1)':'';
+    start(constraints);
 }
 
 function start(e=null) {
     if (devices && devices.getUserMedia) {
-      devices.getUserMedia({ video: true })
+      devices.getUserMedia(e||{ video: true })
         .then(function (stream) {
           adjust();
           video.autoplay = true;
