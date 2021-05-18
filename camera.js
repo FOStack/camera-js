@@ -1,52 +1,54 @@
 'use strict';
-moodule.exports = function() {
+export const cam = function(){
+
     let video = document.createElement('video');
-
+    
     const devices = navigator.mediaDevices || null;
-
+    
     function adjust() {
-        video.videoWidth = '100%';
-        video.videoHeight = '100%';
-        video.style.margin = '0 auto';
-        video.style.position = 'absolute';
-        video.style.top = '0vh';
-        video.style.left = '0vw';
+        v.videoWidth = window.innerWidth;
+        v.videoHeight = window.innerHeight;
+        v.style.margin = '0 auto';
+        v.style.position = 'absolute';
+        v.style.top = '0vh';
+        v.style.left = '0vw';
+        v.style.zIndex = '0';
     }
-
-    function flip(v='environment') { 
+    
+    function flip(d='environment') { 
         const constraints = {
             video: {
-                facingMode: v
+                facingMode: d
             }
         };
-        video.style.transform = (v=='user')?'scale(-1, 1)':'';
+        v.style.transform = (d=='user')?'scale(-1, 1)':'';
         start(constraints);
     }
-
+    
     function start(e=null) {
         if (devices && devices.getUserMedia) {
-          devices.getUserMedia(e||{ video: true })
+            devices.getUserMedia(e||{ video: true })
             .then(function (stream) {
-              adjust();
-              video.autoplay = true;
-              video.srcObject = stream;
-              document.body.appendChild(video);
+                adjust();
+                v.autoplay = true;
+                v.srcObject = stream;
+                document.body.appendChild(v);
             })
             .catch(function (err0r) {
-              console.log("Something went wrong!");
+                console.log("Something went wrong!");
             });
         }
     }
-
+    
     function stop(e=null) {
-      var stream = video.srcObject;
-      var tracks = stream.getTracks();
-
-      for (var i = 0; i < tracks.length; i++) {
+        var stream = v.srcObject;
+        var tracks = stream.getTracks();
+    
+        for (var i = 0; i < tracks.length; i++) {
         var track = tracks[i];
         track.stop();
-      }
-
-      video.srcObject = null;
+        }
+    
+        v.srcObject = null;
     }
 }
