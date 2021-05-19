@@ -1,50 +1,67 @@
+let meta = document.createElement('meta');
+
+let ctn = document.createElement('div');
 let v = document.createElement('video');
 
 const devices = navigator.mediaDevices || null;
 
-function adjust() {
-    v.videoWidth = window.innerWidth;
-    v.videoHeight = window.innerHeight;
-    v.style.margin = '0 auto';
-    v.style.position = 'absolute';
-    v.style.top = '0';
-    v.style.left = '0';
-    v.style.zIndex = '0';
+function disableScreenResize() {
+    meta.name = 'viewport';
+    meta.content = 'width=device-width, user-scalable=no';
+    document.head.appendChild(meta);
 }
 
-function flip(d='environment') { 
+function adjust() {
+    ctn.style.overflow = 'hidden';
+    ctn.style.position = 'absolute';
+    ctn.style.top = '0';
+    ctn.style.left = '0';
+    ctn.style.width = '100%';
+    ctn.style.height = '100%';
+    v.videoWidth = window.innerWidth;
+    v.videoHeight = window.outerHeight;
+}
+
+async function flip(d='environment') { 
     const constraints = {
         video: {
             facingMode: d
         }
     };
     v.style.transform = (d=='user')?'scale(-1, 1)':'';
-    start(constraints);
+    await start(constraints);
 }
 
-function start(e=null) {
+async function start(e=null) {
+    disableScreenResize();
     if (devices && devices.getUserMedia) {
-        devices.getUserMedia(e||{ video: true })
-        .then(function (stream) {
-            adjust();
-            v.autoplay = true;
-            v.srcObject = stream;
-            document.body.appendChild(v);
-        })
-        .catch(function (err0r) {
-            console.log("Something went wrong!");
-        });
+        let stream = await devices.getUserMedia(e||{ video: true });
+        
+        adjust();
+        v.autoplay = true;
+        v.srcObject = stream;
+        ctn.appendChild(v);
+        document.body.appendChild(ctn);
+    
+        // console.log("Something went wrong!");
     }
 }
 
 function stop(e=null) {
-    var stream = v.srcObject;
-    var tracks = stream.getTracks();
+    let stream = v.srcObject;
+    let tracks = stream.getTracks();
 
     for (var i = 0; i < tracks.length; i++) {
-    var track = tracks[i];
-    track.stop();
+        let track = tracks[i];
+        track.stop();
     }
 
     v.srcObject = null;
+}
+
+function exit () {
+    ctn = null;
+    v = null;
+    document.body.removeChild(ctn);
+    document.head.removeChild(meta);
 }

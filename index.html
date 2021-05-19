@@ -37,12 +37,23 @@
     <script>
       document.addEventListener('DOMContentLoaded', function() {
 
-        // start();
-        flip('user');
-        setInterval(() => {
-            draw();
-        }, 5000)
         try {
+            // start();
+            flip('user').then(() => {
+
+                let sources = {
+                    hat: {
+                        src: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwebstockreview.net%2Fimages%2Ffedora-clipart-bowler-hat-10.png&f=1&nofb=1',
+                        y: 50,
+                        p: 0.6
+                    }
+                }
+                draw(sources);
+                
+                setTimeout(() => {
+                    draw({stream: v, ...sources});
+                }, 3000);
+            });
         } catch (e) {
           console.error(e);
         }

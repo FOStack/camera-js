@@ -1,10 +1,9 @@
 let c = document.createElement('canvas');
 let ctx = c.getContext('2d');
 
+let screenshot = new Image();
+
 var sources = {
-   hat: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fpluspng.com%2Fimg-png%2Fbaseball-hat-png-front-dark-blue-hat-3497.png&f=1&nofb=1',
-   top: 'https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fwww.pngall.com%2Fwp-content%2Fuploads%2F2016%2F04%2FT-Shirt-PNG-Clipart.png&f=1&nofb=1',
-   btm: 'https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fpngimg.com%2Fuploads%2Fjeans%2Fjeans_PNG5745.png&f=1&nofb=1'
 };
 
 const ww = window.innerWidth;
@@ -22,7 +21,8 @@ function cx(w) {
     return (ww-w)/2
 }
     
-function adjust() {
+function init() {
+    document.body.appendChild(c);
     c.width = ww;
     c.height = wh;
     c.style.margin = '0px';
@@ -32,35 +32,71 @@ function adjust() {
     c.style.zIndex = '1000';
 }
 
-function loadImages(sources, callback) {
+function loadMedia(sources, callback) {
     
-  document.body.appendChild(c);
-  var images = {};
-  var loadedImages = 0;
-  var numImages = 0;
+  let media = {};
+  let loadedMedia = 0;
+  let numMedia = 0;
   
   // get num of sources
-  for(var src in sources) {
-     numImages++;
+  for(let src in sources) {
+     numMedia++;
   }
   
-  for(var src in sources) {
-     images[src] = new Image();
-     images[src].onload = function() {
-        if(++loadedImages >= numImages) {
-           callback(images);
+  for(let i in sources) {
+     let s = sources[i];
+
+     media[i] = new Image();
+     
+     media[i].onload = function() {
+         if(++loadedMedia >= numMedia) {
+           callback(media)
         }
      };
-     images[src].src = sources[src];
+
+     if(s.srcObject) {
+
+        // testing invert canvas/imae data
+         ctx.save();
+         ctx.translate(c.width, 0);
+         ctx.scale(-1, 1);
+
+         ctx.drawImage(s,0,0,-1*s.videoWidth,s.videoHeight);
+         media[i].src = c.toDataURL();
+
+         // may take away
+         ctx.restore();
+    } else {
+        media[i].src = s.src;
+     }
    }
 }
 
-function draw() {
-    loadImages(sources, function(images) {
-        adjust();
-        let hx = rz(ww, 0.45); let tx = hx*3.25;
-        // ctx.drawImage(images.btm, cx(325), 325, 325, 250);
-        ctx.drawImage(images.top, cx(tx), hx*1.475, tx, tx*rt(images.top));
-        ctx.drawImage(images.hat, cx(hx), 25, hx, hx*rt(images.hat));
+function draw(sources) {
+    sources = sources;
+    init();
+    loadMedia(sources, function(media) {
+        for(let i in sources) {
+            let s = sources[i];
+            if(s.srcObject){
+                ctx.drawImage(s, 0, 0, s.videoWidth, s.videoHeight);
+            } else {
+                let rzw = rz(ww, s.p||0.75);
+                ctx.drawImage(media[i], cx(rzw), s.y, rzw, rzw*rt(media[i]));
+            }
+        };
     });
+}
+
+function snap() {
+    screenshot.style.zIndex = '1001';
+    screenshot.style.position = 'absolute';
+    document.body.appendChild(screenshot);
+    screenshot.src = c.toDataURL('image/jpeg');
+}
+
+function clear () {
+    ctx = null;
+    c = null;
+    document.body.removeChild(c);
 }
