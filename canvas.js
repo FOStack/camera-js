@@ -55,18 +55,9 @@ function loadMedia(sources, callback) {
      };
 
      if(s.srcObject) {
-
-        // testing invert canvas/imae data
-         ctx.save();
-         ctx.translate(c.width, 0);
-         ctx.scale(-1, 1);
-
-         ctx.drawImage(s,0,0,-1*s.videoWidth,s.videoHeight);
-         media[i].src = c.toDataURL();
-
-         // may take away
-         ctx.restore();
-    } else {
+        ctx.drawImage(s,0,0,s.videoWidth,c.height);
+        media[i].src = c.toDataURL();
+     } else {
         media[i].src = s.src;
      }
    }
@@ -79,7 +70,13 @@ function draw(sources) {
         for(let i in sources) {
             let s = sources[i];
             if(s.srcObject){
-                ctx.drawImage(s, 0, 0, s.videoWidth, s.videoHeight);
+                // testing invert canvas/imae data
+                ctx.save();
+                ctx.translate(s.videoWidth, 0);
+                ctx.scale(-1, 1);
+                ctx.drawImage(s, 0, 0, s.videoWidth, c.height);
+                // may take away
+                ctx.restore();
             } else {
                 let rzw = rz(ww, s.p||0.75);
                 ctx.drawImage(media[i], cx(rzw), s.y, rzw, rzw*rt(media[i]));
